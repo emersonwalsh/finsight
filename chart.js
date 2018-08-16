@@ -2,12 +2,12 @@
 // Add search capabilities
 // Add toggle button to view last year vs. comprehensive data
 
-var app = angular.module('myApp', []);
+// var app = angular.module('myApp', []);
 
-app.controller('myCtrl', function($scope) {
-    $scope.userStockSymbol = "FB";
-    // $scope.newSymbol = newSymbol;
-});
+// app.controller('myCtrl', function($scope) {
+//     $scope.userStockSymbol = "FB";
+//     // $scope.newSymbol = newSymbol;
+// });
 
 // app.controller('myCtrl', myChartDirective);
 
