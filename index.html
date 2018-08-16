@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FInsight</title>
+  <link rel="stylesheet" href="resources/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+  <script src="resources/echarts.min.js"></script>
+</head>
+
+<body>
+  <div ng-app="myApp" ng-controller="myCtrl">
+      <div class="topbar">
+       <img src="resources/img/logo1.svg" alt="Finsight Logo">
+       <div class="logo">
+          FInsight
+       </div>
+       <!-- TODO add Company & Sector Tab -->
+       <div class="search-container">
+          <input type="text" 
+            placeholder="Search Stock Symbol"
+            onchange="newSymbol(this.value)"
+            ng-model="userStockSymbol">
+          <button type="submit"
+            ng-click="scope.newSymbol"><i class="fa fa-search" style="color:white;height: 100%;"></i></button>
+        </div>
+    </div>
+    <!-- TODO add toggle button for 100 day view and full view -->
+    <!-- TODO add ng-if="legitSymbol" -->
+    <div id="chart" class="chart"></div>
+    <script src="chart.js"></script>
+  </div>
+</body>
+</html>
