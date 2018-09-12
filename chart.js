@@ -26,6 +26,9 @@ window.addEventListener('resize', function() {
 });
 
 function initialize() {
+
+    // introJs().start();
+
     myChart = echarts.init(document.getElementById('chart'));
     getData();
 }
@@ -144,14 +147,14 @@ function paint() {
         ],
         grid: [
             {
-                left: 120,
-                right: 120,
+                left: '10%',
+                right: '10%',
                 top: '13%',
                 height: '60%'
             },
             {
-                left: 120,
-                right: 120,
+                left: '10%',
+                right: '10%',
                 bottom: '10%',
                 top: '79%'
             }
@@ -178,8 +181,11 @@ function paint() {
                 for(i = 0; i < param.length; i++) {
                     if (param[i].seriesName === 'Volume') {
                         volumeMarker = param[i].marker;
-                        volumeValue = param[i].value;
-                        volumeString += volumeMarker +' Volume: ' + volumeValue + '<br>';
+                        volumeValue = Number(param[i].value);
+                        volumeString += volumeMarker +' Volume: ' + volumeValue.toLocaleString(undefined, {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0
+                          }) + '<br>';
                     } else if (param[i].seriesName === 'K') {
                         dateMarker = param[i].marker;
                         if (typeof param[i].value === 'object') {
@@ -188,19 +194,34 @@ function paint() {
                             dateValue = param[i].value;
 
                         }
-                        openValue = param[i].data[1];
-                        closedValue = param[i].data[2];
-                        lowValue = param[i].data[3];
-                        highValue = param[i].data[4];
+                        openValue = Number(param[i].data[1]);
+                        closedValue = Number(param[i].data[2]);
+                        lowValue = Number(param[i].data[3]);
+                        highValue = Number(param[i].data[4]);
                         dateString += dateMarker + dateValue + '<br>' 
-                            + '  Open: ' + openValue + '<br>' 
-                            + '  Closed: ' + closedValue + '<br>' 
-                            + '  Low: ' + lowValue + '<br>' 
-                            + '  High: ' + highValue + '<br>';
+                            + '  Open: ' + openValue.toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                              }) + '<br>' 
+                            + '  Closed: ' + closedValue.toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                              }) + '<br>' 
+                            + '  Low: ' + lowValue.toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                              }) + '<br>' 
+                            + '  High: ' + highValue.toLocaleString(undefined, {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                              }) + '<br>';
                     } else if (param[i].seriesName === 'MA5') {
                         averageMarker = param[i].marker;
-                        averageValue = param[i].value;
-                        averageString +=  averageMarker + ' MA5: ' + averageValue + '<br>';
+                        averageValue = Number(param[i].value);
+                        averageString +=  averageMarker + ' MA5: ' + averageValue.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                          }) + '<br>';
                     }
                 
                 }
@@ -296,6 +317,19 @@ function paint() {
         ]
     };
     myChart.setOption(option);
+    
+    // handle click event
+    myChart.on('click', function (params) {
+        var url, searchTerm, date;
+        if (params.data.length > 0) {
+            date = params.name;
+            url = 'https://www.google.com/search?';
+            url += 'q=' + config.stockSymbol + '+stock+' + date + '&';
+            url += 'tbm=nws' 
+            window.open(url, '_blank');
+
+        }
+    });
 }
 
 function calculateMA(dayCount) {
