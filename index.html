@@ -6,35 +6,49 @@
   <title>FInsight</title>
   <link rel="stylesheet" href="resources/main.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <!-- <link rel="stylesheet" href="resources/introjs.css" /> -->
+  <link rel="stylesheet" href="resources/introjs.css" />
+  <!-- TODO Add Favicon -->
+  <!-- <link rel="icon" href="resources/img/logo1.svg"> -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
   <script src="resources/echarts.min.js"></script>
+  <script src="resources/intro.js"></script>
+
+
 </head>
 
-<body>
-  <div ng-app="myApp" ng-controller="myCtrl">
+<body ng-app="myApp">
+  <div ng-controller="finsightController">
       <div class="topbar">
        <img src="resources/img/logo1.svg" alt="Finsight Logo">
-       <div class="logo">
+       <div class="logo" data-step="1" data-intro="Welcome to FInsight! Let's visualize your stocks using the Alpha Vantage API.">
           FInsight
        </div>
-
-       <!-- <script src="resources/intro.js"></script>
-       <a href='http://example.com/' data-intro='Hello step one!'></a> -->
-
        <!-- TODO add Company & Sector Tab -->
-       <div class="search-container">
-          <input type="text" 
-            placeholder="Search Stock Symbol"
-            onchange="newSymbol(this.value)">
+       <div class="help-container">
           <button type="submit"
-            ng-click="scope.newSymbol"><i class="fa fa-search" style="color:white;height: 100%;"></i></button>
+          ng-click="startTour()">
+          <i class="fa fa-question-circle" style="color:white;height: 100%;"></i>
+        </button>
+       </div>
+       <div class="search-container">
+          <button type="submit"
+            id="symbol-button"
+            ng-click="newSymbol()">
+            <i class="fa fa-search" style="color:white;height: 100%;"></i>
+          </button>
+          <input type="text"
+            id="user-input"
+            placeholder="Search Stock Symbol"
+            ng-model="userSymbol"
+            data-step="2" data-intro="Search a stock symbol here (ex: AAPL, AMZN, MSFT).">
         </div>
     </div>
     <!-- TODO add toggle button for 100 day view and full view -->
     <!-- TODO add ng-if="legitSymbol" -->
-    <div id="chart" class="chart"></div>
+    <div id="chart" 
+      class="chart"
+      data-step="3" data-intro="Check out the stock performance and volume. Discover why a stock jumped by clicking on a day!"></div>
     <script src="chart.js"></script>
 
   </div>

@@ -34,10 +34,12 @@ body {
 
   .topbar .search-container {
     float: right;
-    height: 100%
+    height: 100%;
+    width: 30%;
   }
   
   .topbar input[type=text] {
+    float: right;
     padding: 6px;
     margin-top: 10px;
     /* margin-bottom: 10px; */
@@ -64,6 +66,19 @@ body {
     border: none;
     cursor: pointer;
     border-radius: 5px;
+  }
+
+  .topbar .help-container button {
+    float: right;
+    padding: 6px 10px;
+    margin-top: 10px;
+    height: 30px;
+    /* margin-bottom: 10px; */
+    margin-right: 16px;
+    background: #21202D;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
   }
   
   .topbar .search-container button:hover {
