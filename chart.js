@@ -104,7 +104,7 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                     text: config.stockSymbol.toUpperCase(),
                     subtext: 'Last Refreshed on ' + config.lastRefresh,
                     left: 'center',
-                    top: '2%',
+                    top: '5%',
                     textStyle: { color: '#8392A5' }
                 },
                 legend: {
