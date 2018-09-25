@@ -13,7 +13,6 @@ body {
     height: 50px;
     background-color: #21202D;
     opacity: 0.95;
-
 }
 
 .topbar .logo {
@@ -42,9 +41,8 @@ body {
     float: right;
     padding: 6px;
     margin-top: 10px;
-    /* margin-bottom: 10px; */
+    width: 50%;
     height: 30px;
-    /* top: 10px; */
     margin-right: 5px;
     font-size: 14px;
     border: solid;
