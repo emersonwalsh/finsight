@@ -50,7 +50,8 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                 outputSize;
         
             apiKey = '449P5UNKD4LX1UO9';
-            stockSymbol = 'FB';
+            // get stock symbol from local storage if it exists
+            stockSymbol = localStorage.getItem('symbol') || 'FB';
             desiredFunction = 'TIME_SERIES_DAILY';
             outputSize = 'compact'; // full or compact
         
@@ -361,6 +362,9 @@ myApp.controller('finsightController', ['$scope', function($scope) {
             if (!stockSymbol) {
                 stockSymbol = $scope.defaultStockSymbol;
             }
+
+            // Save to localStorage
+            localStorage.setItem('symbol', stockSymbol)
                 
             apiKey = '449P5UNKD4LX1UO9';
             desiredFunction = 'TIME_SERIES_DAILY';
