@@ -104,6 +104,7 @@ body {
     right: 0;
     bottom: 0;
     background: #21202D;
+    min-height: 300px;
   }
 
   .controls-container  {

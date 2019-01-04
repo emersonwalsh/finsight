@@ -267,7 +267,8 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                         shadowOffsetX: 2,
                         shadowOffsetY: 2
                     },
-                    bottom: '3%'
+                    bottom: '3%',
+                    height: '4%'
                 }, {
                     type: 'inside',
                     xAxisIndex: [0, 1]
