@@ -25,8 +25,8 @@ myApp.controller('finsightController', ['$scope', function($scope) {
         function startTour() {
             introJs().setOptions({
                 "exitOnOverlayClick": true,
-                "showProgress": true,
-                "showBullets": false,
+                "showProgress": false,
+                "showBullets": true,
                 "showStepNumbers": false,
                 "scrollPadding": 0,
                 "scrollToElement": false
