@@ -20,35 +20,66 @@
 <body ng-app="myApp">
   <div ng-controller="finsightController">
       <div class="topbar">
-       <img src="resources/img/logo1.svg" alt="Finsight Logo">
-       <div class="logo" data-step="1" data-intro="Welcome to FInsight! Let's visualize your stocks using the Alpha Vantage API.">
+       <img src="resources/img/logo1.svg" 
+            alt="Finsight Logo">
+       <div class="logo" 
+            data-step="1" 
+            data-intro="Welcome to FInsight! Let's visualize your stocks using the Alpha Vantage API.">
           Finsight
        </div>
        <!-- TODO add Company & Sector Tab -->
        <div class="help-container">
           <button type="submit"
           ng-click="startTour()">
-          <i class="fa fa-question-circle" style="color:white;height: 100%;"></i>
+          <i class="fa fa-question-circle" 
+              style="color:white;height: 100%;"></i>
         </button>
        </div>
        <div class="search-container">
           <button type="submit"
             id="symbol-button"
-            ng-click="newSymbol()">
-            <i class="fa fa-search" style="color:white;height: 100%;"></i>
+            ng-click="updateSymbol()">
+            <i class="fa fa-search" 
+                style="color:white;height: 100%;"></i>
           </button>
           <input type="text"
             id="user-input"
             placeholder="Search Stock Symbol"
             ng-model="userSymbol"
-            data-step="2" data-intro="Search a stock symbol here (ex: AAPL, AMZN, MSFT).">
+            data-step="2" 
+            data-intro="Search a stock symbol here (ex: AAPL, AMZN, MSFT)."
+            data-position="bottom-right-aligned">
         </div>
     </div>
     <!-- TODO add toggle button for 100 day view and full view -->
+    <div class="controls-container">
+      <div class="controls"
+      data-step="4" 
+      data-intro="Specify your data interval/date range."
+      data-position="bottom-middle-aligned">
+        <div class="controls-item"
+          ng-click="updateTime('Daily');"
+          ng-class="{'controls-item-active': desiredFunction === 'TIME_SERIES_DAILY'}">
+          Daily
+        </div>
+        <div class="controls-item"
+          ng-click="updateTime('Weekly');"
+          ng-class="{'controls-item-active': desiredFunction === 'TIME_SERIES_WEEKLY'}">
+          Weekly
+        </div>
+        <div class="controls-item"
+          ng-click="updateTime('Monthly');"
+          ng-class="{'controls-item-active': desiredFunction === 'TIME_SERIES_MONTHLY'}">
+          Monthly
+        </div>
+      </div>
+    </div>
     <!-- TODO add ng-if="legitSymbol" -->
     <div id="chart" 
       class="chart"
-      data-step="3" data-intro="Check out the stock performance and volume. Discover why a stock jumped by clicking on a day!"></div>
+      data-step="3" 
+      data-intro="Check out the stock performance and volume. Discover why a stock jumped by clicking on a day!">
+    </div>
     <script src="chart.js"></script>
 
   </div>

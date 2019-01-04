@@ -8,81 +8,74 @@ var myApp = angular.module('myApp', []);
 
 myApp.controller('finsightController', ['$scope', function($scope) {
         var myChart,
+            input,
             config = {};
         
         // Variables
-        $scope.defaultStockSymbol = 'FB';
+        $scope.desiredFunction = 'TIME_SERIES_DAILY';
 
         // Function
         $scope.startTour = startTour;
-        $scope.newSymbol = newSymbol;
+        $scope.updateSymbol = updateSymbol;
+        $scope.updateTime = updateTime;
 
-        // Chart resize listener
-        window.addEventListener('resize', function() {
-            if (myChart) {
-                myChart.resize();
-            }
-        });
-
-        // Listen for Enter on input
-        var input = document.getElementById("user-input");
-        input.addEventListener("keyup", function(event) {
-        event.preventDefault();
-        if (event.keyCode === 13) {
-            document.getElementById("symbol-button").click();
-        }
-        });
-
+        /**
+         * Start the product tour
+         */
         function startTour() {
             introJs().setOptions({
                 "exitOnOverlayClick": true,
                 "showProgress": true,
                 "showBullets": false,
-                "showStepNumbers": false
+                "showStepNumbers": false,
+                "scrollPadding": 0,
+                "scrollToElement": false
             }).start();
         }
 
+        /**
+         * Set initial stock variables.
+         */
         function getData() {
-            var apiKey,
-                url,
-                desiredFunction,
-                stockSymbol,
-                outputSize;
+            var stockSymbol,
+                previusSearch;
         
-            apiKey = '449P5UNKD4LX1UO9';
             // get stock symbol from local storage if it exists
-            stockSymbol = localStorage.getItem('symbol') || 'FB';
-            desiredFunction = 'TIME_SERIES_DAILY';
-            outputSize = 'compact'; // full or compact
+            previusSearch = localStorage.getItem('symbol');
+            $scope.userSymbol = previusSearch || 'FB';
         
-            url = 'https://www.alphavantage.co/query?function=' + desiredFunction + '&symbol=' + stockSymbol + '&outputsize=' + outputSize + '&apikey=' + apiKey;
-        
-            $.getJSON(url, function(data) {
-                if (data.hasOwnProperty('Error Message')) {
-                    return;
-                }
-                formatData(data)
-            });
+            searchSymbol();
+
         }
 
+        /**
+         * Parse through stock data using response from Aplha Vantage API.
+         * @param {object} data data returned from Alpha Vantage API
+         */
         function formatData(data) {
             var returnObj = {},
                 dataSet,
                 timeSeries = [],
                 values = [],
                 volume = [],
+                timeKey = 'Time Series (Daily)',
                 time;
+
+            if ($scope.desiredFunction === 'TIME_SERIES_WEEKLY') {
+                timeKey = 'Weekly Time Series';
+            } else if ($scope.desiredFunction === 'TIME_SERIES_MONTHLY') {
+                timeKey = 'Monthly Time Series';
+            }
             
-            for (time in data['Time Series (Daily)']) {
-                if (data['Time Series (Daily)'].hasOwnProperty(time)) {
+            for (time in data[timeKey]) {
+                if (data[timeKey].hasOwnProperty(time)) {
                     timeSeries.push(time);
-                    volume.push(data['Time Series (Daily)'][time]['5. volume']);
-        
+                    volume.push(data[timeKey][time]['5. volume']);
                     dataSet = [];
-                    dataSet.push(data['Time Series (Daily)'][time]['1. open']);
-                    dataSet.push(data['Time Series (Daily)'][time]['4. close']);
-                    dataSet.push(data['Time Series (Daily)'][time]['3. low']);
-                    dataSet.push(data['Time Series (Daily)'][time]['2. high']);
+                    dataSet.push(data[timeKey][time]['1. open']);
+                    dataSet.push(data[timeKey][time]['4. close']);
+                    dataSet.push(data[timeKey][time]['3. low']);
+                    dataSet.push(data[timeKey][time]['2. high']);
                     values.push(dataSet)
                 }
             }
@@ -90,13 +83,18 @@ myApp.controller('finsightController', ['$scope', function($scope) {
             config.timeSeries = timeSeries.reverse();
             config.values = values.reverse();
             config.volume = volume.reverse();
-            config.lastRefresh = data['Meta Data']['3. Last Refreshed'];
-            config.stockSymbol = data['Meta Data']['2. Symbol'];
+            if (data.hasOwnProperty('Meta Data')) {
+                config.lastRefresh = data['Meta Data']['3. Last Refreshed'];
+                config.stockSymbol = data['Meta Data']['2. Symbol'];
+            }
             config.MA5 = calculateMA(5);
         
             paint();
         }
-
+        
+        /**
+         * Paint the candle stick visualization.
+         */
         function paint() {
             // TODO 
             // max and min lines
@@ -337,6 +335,11 @@ myApp.controller('finsightController', ['$scope', function($scope) {
             });
         }
 
+        /**
+         * Calculate the moving average from the stock data.
+         * @param {number} dayCount number of days for the moving average
+         * @return {number} The result of the moving average
+         */
         function calculateMA(dayCount) {
             var result = [];
             for (var i = 0, len = config.values.length; i < len; i++) {
@@ -353,36 +356,85 @@ myApp.controller('finsightController', ['$scope', function($scope) {
             return result;
         }
         
-        function newSymbol() {
-            var stockSymbol = $scope.userSymbol,
-                apiKey,
-                url,
-                desiredFunction;
-
-            if (!stockSymbol) {
-                stockSymbol = $scope.defaultStockSymbol;
+        /**
+         * Update the stock symbol based on the user's input.
+         */
+        function updateSymbol() {
+            if (!$scope.userSymbol) {
+                return;
             }
 
             // Save to localStorage
-            localStorage.setItem('symbol', stockSymbol)
-                
-            apiKey = '449P5UNKD4LX1UO9';
-            desiredFunction = 'TIME_SERIES_DAILY';
-            url = 'https://www.alphavantage.co/query?function=' + desiredFunction + '&symbol=' + stockSymbol +'&apikey=' + apiKey;
-        
-            // TODO handle errors (if !data)
+            localStorage.setItem('symbol', $scope.userSymbol)
+
+            searchSymbol();        
+        }
+
+        /**
+         * Search for stock data using the Alpha Vantage API.
+         */
+        function searchSymbol() {
+            var apiKey = '449P5UNKD4LX1UO9',
+            outputSize = 'compact',
+            url = '';
+
+            url += 'https://www.alphavantage.co/query?function=' + $scope.desiredFunction;
+            url += '&symbol=' + $scope.userSymbol; 
+            // url += '&outputsize=' + outputSize; 
+            url += '&apikey=' + apiKey;
+
             $.getJSON(url, function(data) {
-                if (data.hasOwnProperty('Error Message')) {
+                if (data.hasOwnProperty('Error Message') || data.hasOwnProperty('Note')) {
                     return;
                 }
+                // TODO only update $scope.desiredFunction if data comes back succesfully
                 formatData(data)
             });
         }
+
+        /**
+         * Update the time interval to show.
+         * @param {string} interval The time interval/range specified by the user
+         */
+        function updateTime(interval) {
+            switch (interval) {
+                case 'Daily':
+                    $scope.desiredFunction = 'TIME_SERIES_DAILY';
+                    break;
+                case 'Weekly':
+                    $scope.desiredFunction = 'TIME_SERIES_WEEKLY';
+                    break;
+                case 'Monthly':
+                    $scope.desiredFunction = 'TIME_SERIES_MONTHLY';
+                    break;
+                default:
+                    $scope.desiredFunction = 'TIME_SERIES_DAILY';
+            }
+            searchSymbol();
+        }
         
+        /**
+         * Initial Function
+         */
         function initialize() {
             myChart = echarts.init(document.getElementById('chart'));
             getData();
         }
+
+        // Listeners
+        window.addEventListener('resize', function() {
+            if (myChart) {
+                myChart.resize();
+            }
+        });
+
+        input = document.getElementById("user-input");
+        input.addEventListener("keyup", function(event) {
+        event.preventDefault();
+        if (event.keyCode === 13) {
+            document.getElementById("symbol-button").click();
+        }
+        });
     
         initialize();
 }]);
