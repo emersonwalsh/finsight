@@ -117,12 +117,12 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                     text: config.stockSymbol.toUpperCase(),
                     subtext: 'Last Refreshed on ' + config.lastRefresh,
                     left: 'center',
-                    top: '65px',
+                    top: '85px',
                     textStyle: { color: '#fff' }
                 },
                 legend: {
                     left: '5%',
-                    top: '65px',
+                    top: '60px',
                     data: [{ 
                         name: 'K',
                      }, {
@@ -177,7 +177,7 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                     {
                         left: '10%',
                         right: '10%',
-                        top: '135px',
+                        top: '145px',
                         height: '60%'
                     },
                     {
