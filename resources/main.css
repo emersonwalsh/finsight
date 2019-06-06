@@ -10,9 +10,9 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 50px;
-    background-color: #21202D;
-    opacity: 0.95;
+    height: 0;
+    background-color: transparent;
+    z-index: 2;
 }
 
 .topbar .logo {
@@ -22,24 +22,26 @@ body {
     padding-left: 10px;
     font-family: sans-serif;
     color: white;
+    cursor: pointer;
 }
 
 .topbar img {
     float: left;
-    height: 50px;
+    height: 40px;
     top: 0;
-    padding-left: 10px;
+    padding: 5px 0 0 10px;
 }
 
   .topbar .search-container {
     float: right;
     height: 100%;
-    width: 40%;
+    width: 60%;
+    z-index: 2;
   }
   
   .topbar input[type=text] {
     float: right;
-    padding: 6px;
+    padding: 6px 12px 6px 12px;
     margin-top: 10px;
     width: 50%;
     height: 30px;
@@ -48,8 +50,11 @@ body {
     border: solid;
     border-color: #51A7F9;
     border-width: 2px;
-    border-radius: 5px;
+    border-radius: 15px;
+  }
 
+  .topbar input:focus{
+    outline: none;
   }
   
   .topbar .search-container button {
@@ -57,13 +62,12 @@ body {
     padding: 6px 10px;
     margin-top: 10px;
     height: 30px;
-    /* margin-bottom: 10px; */
     margin-right: 16px;
     background: #51a7f9;
     font-size: 14px;
     border: none;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 50%;
     opacity: 0.9;
   }
 
@@ -75,31 +79,64 @@ body {
     outline: none;
   }
 
-  .topbar .help-container button {
-    float: right;
-    padding: 6px 10px;
-    margin-top: 10px;
-    height: 30px;
-    /* margin-bottom: 10px; */
-    margin-right: 16px;
-    background: #21202D;
-    font-size: 14px;
-    border: none;
-    cursor: pointer;
-    opacity: 0.8;
-  }
-  
-  .topbar .help-container button:focus {
-    outline: none;
+  .search-results {
+    position: absolute;
+    background: white;
+    display: none;
+    top: 45px;
+    width: 30%;
+    max-height: 200px;
+    right: 55px;
+    z-index: 2;
+    border-radius: 3px;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
-  .topbar .help-container button:hover {
-    opacity: 1;
+  .search-results-result {
+    height: 30px;
+    width: 100%;
+    line-height: 30px;
+    padding: 0 10px;
+    cursor: pointer;
+    font-size: 12px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .search-results-result:hover {
+    text-decoration: none;
+    color: #fff;
+    text-shadow: 0 -1px rgba(0, 0, 0, 0.3);
+    border-color: #2380dd #2179d5 #1a60aa;
+    background-color: #338cdf;
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #59aaf4), color-stop(100%, #338cdf));
+    background-image: -webkit-linear-gradient(top, #59aaf4, #338cdf);
+    background-image: -moz-linear-gradient(top, #59aaf4, #338cdf);
+    background-image: -ms-linear-gradient(top, #59aaf4, #338cdf);
+    background-image: -o-linear-gradient(top, #59aaf4, #338cdf);
+    background-image: linear-gradient(top, #59aaf4, #338cdf);
+    -webkit-box-shadow: inset 0 1px rgba(255, 255, 255, 0.2), 0 1px rgba(0, 0, 0, 0.08);
+    -moz-box-shadow: inset 0 1px rgba(255, 255, 255, 0.2), 0 1px rgba(0, 0, 0, 0.08);
+    -ms-box-shadow: inset 0 1px rgba(255, 255, 255, 0.2), 0 1px rgba(0, 0, 0, 0.08);
+    -o-box-shadow: inset 0 1px rgba(255, 255, 255, 0.2), 0 1px rgba(0, 0, 0, 0.08);
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.2), 0 1px rgba(0, 0, 0, 0.08);
+  }
+
+  .search-results-arrow {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 7.5px 8px 7.5px;
+    border-color: transparent transparent white transparent;
+    position: absolute;
+    top: 39px;
+    right: calc(20% + 20px);
   }
 
   .chart {
     position: absolute;
-    top: 70px;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;

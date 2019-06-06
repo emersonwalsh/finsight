@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-
+<!-- TODO add toggle button for 100 day view and full view -->
+<!-- TODO add Company & Sector Tab -->
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,14 +8,11 @@
   <link rel="stylesheet" href="resources/main.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="resources/introjs.css" />
-  <!-- TODO Add Favicon -->
   <link rel='shortcut icon' type='image/x-icon' href='resources/img/favicon.ico' />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
   <script src="resources/echarts.min.js"></script>
   <script src="resources/intro.js"></script>
-
-
 </head>
 
 <body ng-app="myApp">
@@ -22,18 +20,12 @@
       <div class="topbar">
        <img src="resources/img/logo1.svg" 
             alt="Finsight Logo">
-       <div class="logo" 
+       <div class="logo"
+            title="Click on me for a tour!"
+            ng-click="startTour()" 
             data-step="1" 
             data-intro="Welcome to FInsight! Let's visualize your stocks using the Alpha Vantage API.">
           Finsight
-       </div>
-       <!-- TODO add Company & Sector Tab -->
-       <div class="help-container">
-          <button type="submit"
-          ng-click="startTour()">
-          <i class="fa fa-question-circle" 
-              style="color:white;height: 100%;"></i>
-        </button>
        </div>
        <div class="search-container">
           <button type="submit"
@@ -44,18 +36,31 @@
           </button>
           <input type="text"
             id="user-input"
-            placeholder="Search Stock Symbol"
+            class="searchBar"
+            placeholder="Search Company..."
             ng-model="userSymbol"
+            ng-change="searchName();"
             data-step="2" 
             data-intro="Search a stock symbol here (ex: AAPL, AMZN, MSFT)."
             data-position="bottom-right-aligned">
+          <div class="search-results">
+              <!-- <div class="search-results-arrow"></div> -->
+              <div class="search-results-result"
+                ng-repeat="result in searchResults track by $index" 
+                ng-click="searchFromResults(result);"
+                title="{{result['2. name']}}">
+                {{ result['1. symbol'] }}:  {{ result['2. name'] }}
+              </div>
+          </div>
+          
         </div>
     </div>
-    <!-- TODO add toggle button for 100 day view and full view -->
-    <div class="controls-container">
+    
+    <!-- Controls to toggle between daily, weekly, aand montly view -->
+    <!-- <div class="controls-container">
       <div class="controls"
       data-step="4" 
-      data-intro="Specify your data interval/date range."
+      data-intro="Specify your date interval."
       data-position="bottom-middle-aligned">
         <div class="controls-item"
           ng-click="updateTime('Daily');"
@@ -73,7 +78,7 @@
           Monthly
         </div>
       </div>
-    </div>
+    </div> -->
     <!-- TODO add ng-if="legitSymbol" -->
     <div id="chart" 
       class="chart"
@@ -81,7 +86,6 @@
       data-intro="Check out the stock performance and volume. Discover why a stock jumped by clicking on a day!">
     </div>
     <script src="chart.js"></script>
-
   </div>
 </body>
 </html>

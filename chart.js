@@ -13,11 +13,16 @@ myApp.controller('finsightController', ['$scope', function($scope) {
         
         // Variables
         $scope.desiredFunction = 'TIME_SERIES_DAILY';
+        $scope.searchResults = [];
+        $scope.showSearchResults = true;
+        $scope.chartType = 'line'; // line or candlestick
 
         // Function
         $scope.startTour = startTour;
         $scope.updateSymbol = updateSymbol;
         $scope.updateTime = updateTime;
+        $scope.searchName = searchName;
+        $scope.searchFromResults = searchFromResults;
 
         /**
          * Start the product tour
@@ -31,6 +36,12 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                 "scrollPadding": 0,
                 "scrollToElement": false
             }).start();
+
+            // introJs().addHints();
+
+            // Save to localStorage
+            localStorage.setItem('tour', true)
+
         }
 
         /**
@@ -45,7 +56,6 @@ myApp.controller('finsightController', ['$scope', function($scope) {
             $scope.userSymbol = previusSearch || 'FB';
         
             searchSymbol();
-
         }
 
         /**
@@ -72,11 +82,15 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                     timeSeries.push(time);
                     volume.push(data[timeKey][time]['5. volume']);
                     dataSet = [];
-                    dataSet.push(data[timeKey][time]['1. open']);
-                    dataSet.push(data[timeKey][time]['4. close']);
-                    dataSet.push(data[timeKey][time]['3. low']);
-                    dataSet.push(data[timeKey][time]['2. high']);
-                    values.push(dataSet)
+                    if ($scope.chartType === 'line') {
+                        values.push(data[timeKey][time]['4. close']);
+                    } else {
+                        dataSet.push(data[timeKey][time]['1. open']);
+                        dataSet.push(data[timeKey][time]['4. close']);
+                        dataSet.push(data[timeKey][time]['3. low']);
+                        dataSet.push(data[timeKey][time]['2. high']);
+                        values.push(dataSet)
+                    }
                 }
             }
         
@@ -103,20 +117,31 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                     text: config.stockSymbol.toUpperCase(),
                     subtext: 'Last Refreshed on ' + config.lastRefresh,
                     left: 'center',
-                    top: '5%',
-                    textStyle: { color: '#8392A5' }
+                    top: '65px',
+                    textStyle: { color: '#fff' }
                 },
                 legend: {
                     left: '5%',
-                    top: '2%',
-                    data: ['K', 'MA5', 'Volume'],
-                    textStyle: { color: '#8392A5' }
+                    top: '65px',
+                    data: [{ 
+                        name: 'K',
+                     }, {
+                         name: 'MA5'
+                    }, {
+                         name: 'Volume'
+                     }],
+                    textStyle: { color: '#fff' },
+                    selected: {
+                        'K': true,
+                        'MA5': false,
+                        'Volume': true
+                    }
                 },
                 xAxis: [
                     {
                         type: 'category',
                         data: config.timeSeries,
-                        axisLine: { lineStyle: { color: '#8392A5' } },
+                        axisLine: { lineStyle: { color: '#fff' } },
                         axisLabel: {
                             formatter: function (value) {
                                 return echarts.format.formatTime('MM-dd', value);
@@ -127,7 +152,7 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                         type: 'category',
                         data: config.timeSeries,
                         gridIndex: 1,
-                        axisLine: { lineStyle: { color: '#8392A5' } },
+                        axisLine: { lineStyle: { color: '#fff' } },
                         splitLine: {show: false},
                         axisLabel: {show: false},
                         axisTick: {show: false}
@@ -136,7 +161,7 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                 yAxis: [
                     {
                         scale: true,
-                        axisLine: { lineStyle: { color: '#8392A5' } },
+                        axisLine: { lineStyle: { color: '#fff' } },
                         splitLine: { show: false }
                     },
                     {
@@ -152,17 +177,26 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                     {
                         left: '10%',
                         right: '10%',
-                        top: '13%',
+                        top: '135px',
                         height: '60%'
                     },
                     {
                         left: '10%',
                         right: '10%',
                         bottom: '10%',
-                        top: '79%'
+                        top: '81%'
                     }
                 ],
-                backgroundColor: '#21202D',
+                backgroundColor: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    {
+                        offset: 0,
+                        color: '#131315'
+                    },
+                    {
+                        offset: 1,
+                        color: '#212033'
+                    }
+                ], false),
                 tooltip: {
                     trigger: 'axis',
                     formatter: function (param) {
@@ -191,33 +225,43 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                                   }) + '<br>';
                             } else if (param[i].seriesName === 'K') {
                                 dateMarker = param[i].marker;
-                                if (typeof param[i].value === 'object') {
+                                if ($scope.chartType === 'line') {
                                     dateValue = param[i].axisValue;
+                                    closedValue = Number(param[i].data);
+                                    dateString += dateMarker + dateValue + '<br>' 
+                                        + '  Closed: <b>' + closedValue.toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }) + '</b><br>';
                                 } else {
-                                    dateValue = param[i].value;
-        
-                                }
-                                openValue = Number(param[i].data[1]);
-                                closedValue = Number(param[i].data[2]);
-                                lowValue = Number(param[i].data[3]);
-                                highValue = Number(param[i].data[4]);
-                                dateString += dateMarker + dateValue + '<br>' 
-                                    + '  Open: ' + openValue.toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                      }) + '<br>' 
-                                    + '  Closed: ' + closedValue.toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                      }) + '<br>' 
-                                    + '  Low: ' + lowValue.toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                      }) + '<br>' 
-                                    + '  High: ' + highValue.toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                      }) + '<br>';
+                                    if (typeof param[i].value === 'object') {
+                                        dateValue = param[i].axisValue;
+                                    } else {
+                                        dateValue = param[i].value;
+            
+                                    }
+                                    openValue = Number(param[i].data[1]);
+                                    closedValue = Number(param[i].data[2]);
+                                    lowValue = Number(param[i].data[3]);
+                                    highValue = Number(param[i].data[4]);
+                                    dateString += dateMarker + dateValue + '<br>' 
+                                        + '  Open: ' + openValue.toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                          }) + '<br>' 
+                                        + '  Closed: ' + closedValue.toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                          }) + '<br>' 
+                                        + '  Low: ' + lowValue.toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                          }) + '<br>' 
+                                        + '  High: ' + highValue.toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                          }) + '<br>';
+                                }       
                             } else if (param[i].seriesName === 'MA5') {
                                 averageMarker = param[i].marker;
                                 averageValue = Number(param[i].value);
@@ -244,18 +288,18 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                 },
                 dataZoom: [{
                     textStyle: {
-                        color: '#8392A5'
+                        color: '#fff'
                     },
                     xAxisIndex: [0, 1],
                     handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
                     handleSize: '80%',
                     dataBackground: {
                         areaStyle: {
-                            color: '#8392A5'
+                            color: '#fff'
                         },
                         lineStyle: {
                             opacity: 0.8,
-                            color: '#8392A5'
+                            color: '#fff'
                         }
                     },
                     start: 60,
@@ -276,7 +320,7 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                 series: [
                     {
                         name: 'K',
-                        type: 'candlestick',
+                        type: $scope.chartType,
                         data: config.values,
                         itemStyle: {
                             normal: {
@@ -299,7 +343,8 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                         lineStyle: {
                             normal: {
                                 width: 1.5,
-                                color: '#8392A5'
+                                color: '#fff',
+                                type: 'dashed'
                             }
                         }
                     },
@@ -320,6 +365,27 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                     }
                 ]
             };
+
+            // Line specific styling
+            if ($scope.chartType === 'line') {
+                option.series[0].smooth = true;
+                option.series[0].showSymbol = false;
+                option.series[0].lineStyle = { // use areaaStyle also?
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                offset: 0,
+                                color: '#0CF49B'
+                            },
+                            {
+                                offset: 1,
+                                color: '#FD1050'
+                            }
+                        ], false),
+                    }
+                };
+            }
+
+
             myChart.setOption(option);
             
             // handle click event
@@ -350,7 +416,11 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                 }
                 var sum = 0;
                 for (var j = 0; j < dayCount; j++) {
-                    sum += Number(config.values[i - j][1]);
+                    if ($scope.chartType === 'line') {
+                        sum += Number(config.values[i - j]);
+                    } else {
+                        sum += Number(config.values[i - j][1]);
+                    }
                 }
                 result.push((sum / dayCount).toFixed(2));
             }
@@ -376,21 +446,54 @@ myApp.controller('finsightController', ['$scope', function($scope) {
          */
         function searchSymbol() {
             var apiKey = '449P5UNKD4LX1UO9',
-            outputSize = 'compact',
+            outputSize = 'compact', // full or compact
             url = '';
 
             url += 'https://www.alphavantage.co/query?function=' + $scope.desiredFunction;
             url += '&symbol=' + $scope.userSymbol; 
-            // url += '&outputsize=' + outputSize; 
+
+            // TODO if daily by default set output size to 'full'
+            if ($scope.desiredFunction === 'TIME_SERIES_DAILY') {
+                url += '&outputsize=' + outputSize; 
+            }
             url += '&apikey=' + apiKey;
 
-            $.getJSON(url, function(data) {
-                if (data.hasOwnProperty('Error Message') || data.hasOwnProperty('Note')) {
-                    return;
+            // $.getJSON(url, function(data) {
+            //     if (data.hasOwnProperty('Error Message') || data.hasOwnProperty('Note')) {
+            //         return;
+            //     }
+            //     // TODO only update $scope.desiredFunction if data comes back succesfully
+            //     formatData(data)
+            // });
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                async: false,
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.hasOwnProperty('Error Message') || data.hasOwnProperty('Note')) {
+                        return;
+                    }
+                    // TODO only update $scope.desiredFunction if data comes back succesfully
+                    formatData(data)
+                },
+                error: function (e) {
+                    alert("error");
                 }
-                // TODO only update $scope.desiredFunction if data comes back succesfully
-                formatData(data)
             });
+        }
+
+        /**
+         * Update chart with new symbol selected from search results
+         * @param {object} result selected search result
+         */
+        function searchFromResults(result) {
+            if (result.hasOwnProperty('1. symbol')) {
+                $scope.userSymbol = result['1. symbol']
+                searchSymbol();
+            }
         }
 
         /**
@@ -413,11 +516,70 @@ myApp.controller('finsightController', ['$scope', function($scope) {
             }
             searchSymbol();
         }
+
+        /**
+         * Search for valid stocks
+         */
+        function searchName() {
+            // TODO add 0.25 sec timeout before hitting url
+
+            var apiKey = '449P5UNKD4LX1UO9',
+                url = '';
+
+            $scope.searchResults = [];
+
+            url += 'https://www.alphavantage.co/query?function=SYMBOL_SEARCH';
+            url += '&keywords=' + $scope.userSymbol; 
+
+            url += '&apikey=' + apiKey;
+
+            // $.getJSON(url, function(data) {
+            //     var i;
+            //     if (data.hasOwnProperty('bestMatches')) {
+            //         $scope.searchResults = data.bestMatches;
+            //         console.log($scope.searchResults);
+            //     }
+            // });
+
+            $.ajax({
+                type: 'GET',
+                url: url,
+                async: false,
+                contentType: "application/json",
+                dataType: 'json',
+                success: function (data) {
+                    var i;
+                    if (data.hasOwnProperty('bestMatches')) {
+                        $scope.searchResults = data.bestMatches;
+                        console.log($scope.searchResults);
+                    }
+                },
+                error: function (e) {
+                    alert("error");
+                }
+            });
+        }
         
         /**
          * Initial Function
          */
         function initialize() {
+            $(document).ready(function(){
+                $('.searchBar').focus(function(){
+                    $('.search-results').fadeIn(250);
+                    $('.search-results-arrow').fadeIn(250);
+                }).focusout(function(){
+                    $('.search-results').fadeOut(250);
+                    $('.search-results-arrow').fadeOut(250);
+                });
+             });
+
+            var productTour = localStorage.getItem('tour');
+
+            // Start product tour if first time for user
+            if (!productTour) {
+                startTour();
+            }
             myChart = echarts.init(document.getElementById('chart'));
             getData();
         }
