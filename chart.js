@@ -16,6 +16,7 @@ myApp.controller('finsightController', ['$scope', function($scope) {
         $scope.searchResults = [];
         $scope.showSearchResults = true;
         $scope.chartType = 'line'; // line or candlestick
+        $scope.data = {};
 
         // Function
         $scope.startTour = startTour;
@@ -60,9 +61,8 @@ myApp.controller('finsightController', ['$scope', function($scope) {
 
         /**
          * Parse through stock data using response from Aplha Vantage API.
-         * @param {object} data data returned from Alpha Vantage API
          */
-        function formatData(data) {
+        function formatData() {
             var returnObj = {},
                 dataSet,
                 timeSeries = [],
@@ -77,18 +77,18 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                 timeKey = 'Monthly Time Series';
             }
             
-            for (time in data[timeKey]) {
-                if (data[timeKey].hasOwnProperty(time)) {
+            for (time in $scope.data[timeKey]) {
+                if ($scope.data[timeKey].hasOwnProperty(time)) {
                     timeSeries.push(time);
-                    volume.push(data[timeKey][time]['5. volume']);
+                    volume.push($scope.data[timeKey][time]['5. volume']);
                     dataSet = [];
                     if ($scope.chartType === 'line') {
-                        values.push(data[timeKey][time]['4. close']);
+                        values.push($scope.data[timeKey][time]['4. close']);
                     } else {
-                        dataSet.push(data[timeKey][time]['1. open']);
-                        dataSet.push(data[timeKey][time]['4. close']);
-                        dataSet.push(data[timeKey][time]['3. low']);
-                        dataSet.push(data[timeKey][time]['2. high']);
+                        dataSet.push($scope.data[timeKey][time]['1. open']);
+                        dataSet.push($scope.data[timeKey][time]['4. close']);
+                        dataSet.push($scope.data[timeKey][time]['3. low']);
+                        dataSet.push($scope.data[timeKey][time]['2. high']);
                         values.push(dataSet)
                     }
                 }
@@ -97,9 +97,9 @@ myApp.controller('finsightController', ['$scope', function($scope) {
             config.timeSeries = timeSeries.reverse();
             config.values = values.reverse();
             config.volume = volume.reverse();
-            if (data.hasOwnProperty('Meta Data')) {
-                config.lastRefresh = data['Meta Data']['3. Last Refreshed'];
-                config.stockSymbol = data['Meta Data']['2. Symbol'];
+            if ($scope.data.hasOwnProperty('Meta Data')) {
+                config.lastRefresh = $scope.data['Meta Data']['3. Last Refreshed'];
+                config.stockSymbol = $scope.data['Meta Data']['2. Symbol'];
             }
             config.MA5 = calculateMA(5);
         
@@ -135,6 +135,36 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                         'K': true,
                         'MA5': false,
                         'Volume': true
+                    }
+                },
+                toolbox: {
+                    right: '5%',
+                    top: '60px',
+                    feature: {
+                        myTool1: {
+                            show: true,
+                            title: 'Line',
+                            icon: 'path://M76.2286606,33.3063164c-3.2611847,0-5.9146805,2.6534958-5.9146805,5.915493  c0,0.6927032,0.1259232,1.3550034,0.3457642,1.9732819L58.632,51.3508034  c-0.848156-0.4704018-1.8222809-0.7402534-2.8590088-0.7402534c-1.1175003,0-2.1597519,0.3170967-3.0521851,0.8576736  l-6.8813782-5.3488617c0.1744423-0.5572128,0.2687798-1.149437,0.2687798-1.7633667  c0-3.2619972-2.6534958-5.915493-5.9146767-5.915493c-3.2611771,0-5.9146729,2.6534958-5.9146729,5.915493  c0,0.8643341,0.1908722,1.6834145,0.5255775,2.4242859l-8.6094761,8.6088638  c-0.7408695-0.3347092-1.5600548-0.525631-2.4244366-0.525631c-3.261179,0-5.9146748,2.6534958-5.9146748,5.915493  c0,3.2611771,2.6534958,5.9146729,5.9146748,5.9146729s5.9146748-2.6534958,5.9146748-5.9146729  c0-0.8646393-0.1908741-1.6840286-0.5256329-2.4250526l8.6095314-8.6089134  c0.7408676,0.3347054,1.5600548,0.525631,2.4244347,0.525631c1.1170883,0,2.1590385-0.3170471,3.0513153-0.8575249  l6.8813782,5.3488121c-0.1743889,0.5571632-0.2687263,1.1493874-0.2687263,1.7632637  c0,3.2611809,2.6534958,5.9146767,5.915493,5.9146767s5.915493-2.6534958,5.915493-5.9146767  c0-0.6931114-0.1260719-1.3558197-0.3461723-1.9743576l12.0271339-10.155098  c0.8482056,0.4706573,1.8223801,0.7407188,2.8592148,0.7407188c3.2619934,0,5.9154892-2.6534958,5.9154892-5.9146767  C82.1441498,35.9598122,79.490654,33.3063164,76.2286606,33.3063164z M23.7705231,62.5005035  c-0.9491978,0-1.7214966-0.7723007-1.7214966-1.7214966c0-0.9500198,0.7722988-1.7223167,1.7214966-1.7223167  s1.7214966,0.7722969,1.7214966,1.7223167C25.4920197,61.7282028,24.7197208,62.5005035,23.7705231,62.5005035z   M38.4720345,44.3559952c0-0.950016,0.7723007-1.7223129,1.7214966-1.7223129c0.9491997,0,1.7214966,0.7722969,1.7214966,1.7223129  c0,0.9491997-0.7722969,1.7214966-1.7214966,1.7214966C39.2443352,46.0774918,38.4720345,45.3051949,38.4720345,44.3559952z   M55.7729912,58.2467194c-0.950016,0-1.7223167-0.7722969-1.7223167-1.7214966c0-0.9491959,0.7723007-1.7214966,1.7223167-1.7214966  s1.7223167,0.7723007,1.7223167,1.7214966C57.4953079,57.4744225,56.7230072,58.2467194,55.7729912,58.2467194z   M76.2286606,40.943306c-0.9492035,0-1.7214966-0.7722969-1.7214966-1.7214966c0-0.950016,0.7722931-1.7223129,1.7214966-1.7223129  c0.9500122,0,1.7223129,0.7722969,1.7223129,1.7223129C77.9509735,40.1710091,77.1786728,40.943306,76.2286606,40.943306z',
+                            onclick: function (){
+                                if ($scope.chartType === 'line') {
+                                    return;
+                                }
+                                $scope.chartType = 'line';
+                                formatData();
+                            }
+                        },
+                        myTool2: {
+                            show: true,
+                            title: 'Candle Stick',
+                            icon: 'path://M50,87.36914a1.24991,1.24991,0,0,0,1.25-1.25V75.13965h7.42432a1.24991,1.24991,0,0,0,1.25-1.25V25.541a1.24991,1.24991,0,0,0-1.25-1.25H51.25V13.88086a1.25,1.25,0,0,0-2.5,0V24.291H41.32568a1.24991,1.24991,0,0,0-1.25,1.25V73.88965a1.24991,1.24991,0,0,0,1.25,1.25H48.75V86.11914A1.24991,1.24991,0,0,0,50,87.36914ZM42.57568,26.791H57.42432V72.63965H42.57568Z',
+                            onclick: function (){
+                                if ($scope.chartType === 'candlestick') {
+                                    return;
+                                }
+                                $scope.chartType = 'candlestick';
+                                formatData();
+                            }
+                        }
                     }
                 },
                 xAxis: [
@@ -477,7 +507,8 @@ myApp.controller('finsightController', ['$scope', function($scope) {
                         return;
                     }
                     // TODO only update $scope.desiredFunction if data comes back succesfully
-                    formatData(data)
+                    $scope.data = data;
+                    formatData()
                 },
                 error: function (e) {
                     alert("error");
